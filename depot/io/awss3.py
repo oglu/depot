@@ -23,18 +23,9 @@ class S3StoredFile(StoredFile):
         _check_file_id(file_id)
         self._key = key
 
-        metadata_info = {'filename': key.get_metadata('x-depot-filename'),
-                         'content_type': key.content_type,
+        metadata_info = {'content_type': key.content_type,
                          'content_length': key.size,
                          'last_modified': None}
-
-        try:
-            last_modified = key.get_metadata('x-depot-modified')
-            if last_modified:
-                metadata_info['last_modified'] = datetime.strptime(last_modified,
-                                                                   '%Y-%m-%d %H:%M:%S')
-        except:
-            pass
 
         super(S3StoredFile, self).__init__(file_id=file_id, **metadata_info)
 
@@ -122,9 +113,6 @@ class S3Storage(FileStorage):
 
     def __save_file(self, key, content, filename, content_type=None):
         key.set_metadata('content-type', content_type)
-        key.set_metadata('x-depot-filename', filename)
-        key.set_metadata('x-depot-modified', utils.timestamp())
-        key.set_metadata('Content-Disposition', 'inline; filename="%s"' % filename)
 
         if hasattr(content, 'read'):
             can_seek_and_tell = True
