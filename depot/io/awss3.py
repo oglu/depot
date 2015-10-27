@@ -44,7 +44,7 @@ class S3StoredFile(StoredFile):
 
     @property
     def public_url(self):
-        return self._key.generate_url(expires_in=0, query_auth=False)
+        return self._key.generate_url(expires_in=100, query_auth=False)
 
 
 class BucketDriver(object):
